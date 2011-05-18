@@ -1000,7 +1000,10 @@ qq.extend(qq.UploadHandlerForm.prototype, {
         }                
 
         var fileName = this.getName(id);
-                
+
+        params = params || {};
+        params['qqfile'] = fileName;
+
         var iframe = this._createIframe(id);
         var form = this._createForm(iframe, params);
         form.appendChild(input);
