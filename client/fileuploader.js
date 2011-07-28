@@ -662,6 +662,48 @@ qq.extend(qq.FileUploader.prototype, {
         });
     }    
 });
+
+qq.ButtonFileUploader = function(o) {
+	// call parent constructor
+    qq.FileUploader.apply(this, arguments);
+    qq.extend(this._options, o);
+    
+    this._que = [];
+};
+
+//inherit from FileUploader
+qq.extend(qq.ButtonFileUploader.prototype, qq.FileUploader.prototype);
+
+qq.extend(qq.ButtonFileUploader.prototype, {
+	// method to call when clicking a button
+	startUploads: function() {
+		for (var i=0; i<this._que.length; i++) {
+			this._uploadFile(this._que[i]);
+		}
+	},
+	// method to add file to que
+	_addFileToQue: function(fileContainer) {
+		this._que[this._que.length] = fileContainer;
+	},
+	// overrule method to disable autoUpload
+	_onInputChange: function(input) {
+		if (this._handler instanceof qq.UploadHandlerXhr) {                
+			for (var i=0; i<input.files.length; i++) {
+	            if ( !this._validateFile(input.files[i])) {
+	                return;
+	            }            
+	        }
+	        
+	        for (var i=0; i<input.files.length; i++) {
+	        	this._addFileToQue(input.files[i]);        
+	        }                   
+	    } else {             
+	        if (this._validateFile(input)) {                
+	        	this._addFileToQue(input);                                    
+	        }                      
+	    }
+	}
+});
     
 qq.UploadDropZone = function(o){
     this._options = {
