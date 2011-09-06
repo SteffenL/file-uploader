@@ -1061,7 +1061,7 @@ qq.extend(qq.UploadHandlerForm.prototype, {
         this.log("innerHTML = " + doc.body.innerHTML);
 
         var json = doc.body.innerHTML.replace("\n", "");
-        json = doc.body.innerHTML.match(/^(<(\w+)>)?(.*?)(<\/\2>)?$/)[3];
+        json = doc.body.innerHTML.match(/^\s*(<(\w+)>)?(.*?)(<\/\2>)?\s*$/)[3];
                         
         try {
             response = eval("(" + json + ")");
