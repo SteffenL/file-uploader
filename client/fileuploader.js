@@ -1206,7 +1206,11 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
         params['qqfile'] = name;
         var queryString = qq.obj2url(params, this._options.action);
 
+        // add csrf
+        var csrf_token = $('meta[name=csrf-token]').attr('content');
+
         xhr.open("POST", queryString, true);
+        xhr.setRequestHeader("X-Csrf-Token", csrf_token);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("X-File-Name", encodeURIComponent(name));
         xhr.setRequestHeader("Content-Type", "application/octet-stream");
