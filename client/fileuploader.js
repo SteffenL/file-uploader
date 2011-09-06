@@ -119,7 +119,7 @@ qq.toElement = (function(){
  * Fixes opacity in IE6-8.
  */
 qq.css = function(element, styles){
-    if (styles.opacity != null){
+    if (styles.opacity !== null && styles.opacity !== undefined) {
         if (typeof element.style.opacity != 'string' && typeof(element.filters) != 'undefined'){
             styles.filter = 'alpha(opacity=' + Math.round(100 * styles.opacity) + ')';
         }
@@ -1059,9 +1059,12 @@ qq.extend(qq.UploadHandlerForm.prototype, {
         
         this.log("converting iframe's innerHTML to JSON");
         this.log("innerHTML = " + doc.body.innerHTML);
+
+        var json = doc.body.innerHTML.replace("\n", "");
+        json = doc.body.innerHTML.match(/^(<(\w+)>)?(.*?)(<\/\2>)?$/)[3];
                         
         try {
-            response = eval("(" + doc.body.innerHTML + ")");
+            response = eval("(" + json + ")");
         } catch(err){
             response = {};
         }        
@@ -1097,7 +1100,13 @@ qq.extend(qq.UploadHandlerForm.prototype, {
         // form.setAttribute('method', 'post');
         // form.setAttribute('enctype', 'multipart/form-data');
         // Because in this case file won't be attached to request
-        var form = qq.toElement('<form method="post" enctype="multipart/form-data"></form>');
+
+        var csrf_param = $('meta[name=csrf-param]').attr('content');
+        var csrf_token = $('meta[name=csrf-token]').attr('content');
+
+        var form = qq.toElement('<form method="post" enctype="multipart/form-data">' +
+          '<input name="'+ csrf_param +'" type="hidden" value="'+ csrf_token +'">' +
+          '</form>');
 
         var queryString = qq.obj2url(params, this._options.action);
 
