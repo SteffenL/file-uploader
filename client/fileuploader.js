@@ -687,6 +687,8 @@ qq.extend(qq.ButtonFileUploader.prototype, {
 	},
 	// overrule method to disable autoUpload
 	_onInputChange: function(input) {
+		// reset que to 'forget' previously selected files
+		this._que = [];
 		if (this._handler instanceof qq.UploadHandlerXhr) {                
 			for (var i=0; i<input.files.length; i++) {
 	            if ( !this._validateFile(input.files[i])) {
