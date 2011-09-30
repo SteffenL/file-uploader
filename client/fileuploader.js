@@ -237,6 +237,11 @@ qq.obj2url = function(obj, temp, prefixDone){
                      .replace(/%20/g, '+');
 };
 
+// Quick templating
+// https://gist.github.com/964762
+qq.template = function(a,b){return function(c,d){return a.replace(/#\{([^}]*)}/g,function(a,e){return Function("x","with(x)return "+e).call(c,d||b||{})})}};
+
+//
 //
 //
 // Uploader Classes
@@ -267,6 +272,13 @@ qq.FileUploaderBasic = function(o){
         onProgress: function(id, fileName, loaded, total){},
         onComplete: function(id, fileName, responseJSON){},
         onCancel: function(id, fileName){},
+        // labels
+        labels: {
+            uploadDropArea: "Drop files here to upload",
+            uploadButton: "Upload a file",
+            cancel: "Cancel",
+            failed: "Failed"
+        },
         // messages
         messages: {
             typeError: "{file} has invalid extension. Only {extensions} are allowed.",
@@ -484,20 +496,20 @@ qq.FileUploader = function(o){
         // if set, will be used instead of qq-upload-list in template
         listElement: null,
 
-        template: '<div class="qq-uploader">' +
-                '<div class="qq-upload-drop-area"><span>Drop files here to upload</span></div>' +
-                '<div class="qq-upload-button">Upload a file</div>' +
+        template: qq.template('<div class="qq-uploader">' +
+                '<div class="qq-upload-drop-area"><span>#{this.dropArea}</span></div>' +
+                '<div class="qq-upload-button">#{this.upload}</div>' +
                 '<ul class="qq-upload-list"></ul>' +
-             '</div>',
+             '</div>'),
 
         // template for one item in file list
-        fileTemplate: '<li>' +
+        fileTemplate: qq.template('<li>' +
                 '<span class="qq-upload-file"></span>' +
                 '<span class="qq-upload-spinner"></span>' +
                 '<span class="qq-upload-size"></span>' +
-                '<a class="qq-upload-cancel" href="#">Cancel</a>' +
-                '<span class="qq-upload-failed-text">Failed</span>' +
-            '</li>',
+                '<a class="qq-upload-cancel" href="#">#{this.cancel}</a>' +
+                '<span class="qq-upload-failed-text">#{this.failed}</span>' +
+            '</li>'),
 
         classes: {
             // used to get elements from templates
@@ -519,9 +531,11 @@ qq.FileUploader = function(o){
     });
     // overwrite options with user supplied
     qq.extend(this._options, o);
-
     this._element = this._options.element;
-    this._element.innerHTML = this._options.template;
+    this._element.innerHTML = this._options.template({
+        dropArea: this._options.labels.uploadDropArea,
+        upload: this._options.labels.uploadButton
+    });
     this._listElement = this._options.listElement || this._find(this._element, 'list');
 
     this._classes = this._options.classes;
@@ -622,7 +636,10 @@ qq.extend(qq.FileUploader.prototype, {
         }
     },
     _addToList: function(id, fileName){
-        var item = qq.toElement(this._options.fileTemplate);
+        var item = qq.toElement(this._options.fileTemplate({
+            cancel: this._options.labels.cancel,
+            failed: this._options.labels.failed
+        }));
         item.qqFileId = id;
 
         var fileElement = this._find(item, 'file');
