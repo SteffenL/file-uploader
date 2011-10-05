@@ -666,6 +666,11 @@ qq.extend(qq.FileUploader.prototype, {
 qq.ButtonFileUploader = function(o) {
 	// call parent constructor
     qq.FileUploader.apply(this, arguments);
+    // additional options
+    qq.extend(this._options, { 
+    	onChange: function(fileName){} 
+    });
+    // overwrite options with user supplied    
     qq.extend(this._options, o);
     
     this._que = [];
@@ -691,17 +696,13 @@ qq.extend(qq.ButtonFileUploader.prototype, {
 		this._que = [];
 		if (this._handler instanceof qq.UploadHandlerXhr) {                
 			for (var i=0; i<input.files.length; i++) {
-	            if ( !this._validateFile(input.files[i])) {
-	                return;
-	            }            
-	        }
-	        
-	        for (var i=0; i<input.files.length; i++) {
-	        	this._addFileToQue(input.files[i]);        
+	            if ( this._validateFile(input.files[i]) && this._options.onChange(input.files[i].fileName) !== false) {
+	        		this._addFileToQue(input.files[i]);        
+				}
 	        }                   
-	    } else {             
-	        if (this._validateFile(input)) {                
-	        	this._addFileToQue(input);                                    
+	    } else {
+	        if (this._validateFile(input) && this._options.onChange(input.value) !== false) {
+        		this._addFileToQue(input);                                    
 	        }                      
 	    }
 	}

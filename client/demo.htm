@@ -44,7 +44,11 @@
                 	'<div class="qq-upload-button">Select a file</div>' +
                 	'<ul class="qq-upload-list"></ul>' + 
              	'</div>',
-            	button: null
+            	button: null,
+            	onChange: function(filename) {
+            		// return false if invalid extension
+            		return (filename.split('.').pop().toLowerCase() in ['png','jpg','gif']);
+            	}
             });
             
             document.getElementById('start-upload').onclick = function() {
