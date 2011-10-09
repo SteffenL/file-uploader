@@ -736,6 +736,12 @@ qq.UploadDropZone.prototype = {
             e.preventDefault();
             self._options.onDrop(e);
         });          
+
+
+		qq.attach(document, 'dragend', function(e){
+			self._element.style.display = 'none';
+		}); 
+
     },
     _isValidFileDrag: function(e){
         var dt = e.dataTransfer,
