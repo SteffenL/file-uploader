@@ -23,6 +23,17 @@ qq.extend = function(first, second){
 };
 
 /**
+ * Pretty much like extend, but recursively merges objects. 
+ */
+qq.rextend = function(first,second){
+	for( var prop in second ){
+		if( second[prop] != null && second[prop].constructor == Object )
+			qq.rextend( first[prop] = first[prop] || {}, second[prop] ); 
+		else
+			first[prop] = second[prop]; 
+	}
+}
+/**
  * Searches for a given element in the array, returns -1 if it is not present.
  * @param {Number} [from] The index at which to begin the search
  */
@@ -291,7 +302,7 @@ qq.FileUploaderBasic = function(o){
             alert(message);
         }
     };
-    qq.extend(this._options, o);
+    qq.rextend(this._options, o);
 
     // number of files being uploaded
     this._filesInProgress = 0;
@@ -489,24 +500,23 @@ qq.FileUploaderBasic.prototype = {
 qq.FileUploader = function(o){
     // call parent constructor
     qq.FileUploaderBasic.apply(this, arguments);
-
-    // additional options
-    qq.extend(this._options, {
+    // additional options    
+    qq.rextend( this._options, {
         element: null,
         // if set, will be used instead of qq-upload-list in template
         listElement: null,
         template: qq.template('<div class="qq-uploader">' +
-                '<div class="qq-upload-drop-area"><span>#{this.dropArea}</span></div>' +
-                '<div class="qq-upload-button">#{this.upload}</div>' +
-                '<ul class="qq-upload-list"></ul>' +
+                '<div class="#{this.classes.drop}"><span>#{this.labels.drop}</span></div>' +
+                '<div class="#{this.classes.button}">#{this.labels.button}</div>' +
+                '<ul class="#{this.classes.list}"></ul>' +
              '</div>'),
 
         // template for one item in file list
         fileTemplate: qq.template('<li>' +
-                '<span class="qq-upload-file"></span>' +
-                '<span class="qq-upload-spinner"></span>' +
-                '<span class="qq-upload-size"></span>' +
-                '<a class="qq-upload-cancel" href="#">#{this.cancel}</a>' +
+                '<span class="#{this.classes.file}"></span>' +
+                '<span class="#{this.classes.spinner}"></span>' +
+                '<span class="#{this.classes.size}"></span>' +
+                '<a class="#{this.classes.cancel}" href="#">#{this.cancel}</a>' +
                 '<span class="qq-upload-failed-text">#{this.failed}</span>' +
             '</li>'),
 
@@ -525,15 +535,21 @@ qq.FileUploader = function(o){
             // used in css to hide progress spinner
             success: 'qq-upload-success',
             fail: 'qq-upload-fail'
+        }, 
+        // labels
+        labels: {
+            drop: "Drop files here to upload",
+            button: "Upload a file",
+            cancel: "Cancel",
+            failed: "Failed"
         }
+
     });
-    // overwrite options with user supplied
-    qq.extend(this._options, o);
+    // overwrite options with user supplied    
+    qq.rextend(this._options, o);
+console.log( o );
     this._element = this._options.element;
-    this._element.innerHTML = this._options.template({
-        dropArea: this._options.labels.uploadDropArea,
-        upload: this._options.labels.uploadButton
-    });
+    this._element.innerHTML = this._options.template(this._options);
     this._listElement = this._options.listElement || this._find(this._element, 'list');
 
     this._classes = this._options.classes;
@@ -590,13 +606,6 @@ qq.extend(qq.FileUploader.prototype, {
             dropArea.style.display = 'block';
             qq.addClass(dropArea, self._classes.dragStarted);
         });                 
-
-        qq.attach(document, 'dragenter', function(e){
-            if (!dz._isValidFileDrag(e)) return;
-
-            dropArea.style.display = 'block';
-        });
-
         qq.attach(document, 'dragleave', function(e){
             if (!dz._isValidFileDrag(e)) return;
 
@@ -643,10 +652,7 @@ qq.extend(qq.FileUploader.prototype, {
         }
     },
     _addToList: function(id, fileName){
-        var item = qq.toElement(this._options.fileTemplate({
-            cancel: this._options.labels.cancel,
-            failed: this._options.labels.failed
-        }));
+        var item = qq.toElement(this._options.fileTemplate(this._options));
         item.qqFileId = id;
 
         var fileElement = this._find(item, 'file');
@@ -692,11 +698,11 @@ qq.ButtonFileUploader = function(o) {
 	// call parent constructor
     qq.FileUploader.apply(this, arguments);
     // additional options
-    qq.extend(this._options, { 
+    qq.rextend(this._options, { 
     	onChange: function(fileName){} 
     });
     // overwrite options with user supplied    
-    qq.extend(this._options, o);
+    qq.rextend(this._options, o);
     
     this._que = [];
 };
@@ -742,7 +748,7 @@ qq.UploadDropZone = function(o){
         onLeaveNotDescendants: function(e){},
         onDrop: function(e){}
     };
-    qq.extend(this._options, o);
+    qq.rextend(this._options, o);
 
     this._element = this._options.element;
 
@@ -837,7 +843,7 @@ qq.UploadButton = function(o){
         focusClass: 'qq-upload-button-focus'
     };
 
-    qq.extend(this._options, o);
+    qq.rextend(this._options, o);
 
     this._element = this._options.element;
 
@@ -936,7 +942,7 @@ qq.UploadHandlerAbstract = function(o){
         onComplete: function(id, fileName, response){},
         onCancel: function(id, fileName){}
     };
-    qq.extend(this._options, o);
+    qq.rextend(this._options, o);
 
     this._queue = [];
     // params for files in queue
@@ -1283,6 +1289,7 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
         var queryString = qq.obj2url(params, this._options.action);
 
         // add csrf
+		// TODO: This shouldn't use jQuery !!! 
         var csrf_token = $('meta[name=csrf-token]').attr('content');
 
         xhr.open("POST", queryString, true);
