@@ -278,6 +278,7 @@ qq.FileUploaderBasic = function(o){
         allowedExtensions: [],
         sizeLimit: 0,
         minSizeLimit: 0,
+        multipart: false,
         // events
         // return false to cancel submit
         onSubmit: function(id, fileName){},
@@ -348,6 +349,7 @@ qq.FileUploaderBasic.prototype = {
             debug: this._options.debug,
             action: this._options.action,
             maxConnections: this._options.maxConnections,
+            multipart: this._options.multipart,
             onProgress: function(id, fileName, loaded, total){
                 self._onProgress(id, fileName, loaded, total);
                 self._options.onProgress.call(self, id, fileName, loaded, total);
@@ -1289,10 +1291,22 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
             }
         };
 
-        // build query string
         params = params || {};
         params['qqfile'] = name;
-        var queryString = qq.obj2url(params, this._options.action);
+
+        if(self._options.multipart){
+          var queryString = this._options.action;
+          var data = new FormData();
+          for (var paramName in params){
+            var paramValue = params[paramName];
+            data.append(paramName, paramValue);
+          }
+          data.append("file", file);
+        } else {
+          // build query string
+          var queryString = qq.obj2url(params, this._options.action);
+          var data = file;
+        }
 
         // add csrf
 		// TODO: This shouldn't use jQuery !!!
@@ -1304,8 +1318,9 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
         xhr.setRequestHeader("X-Csrf-Token", csrf_token);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("X-File-Name", encodeURIComponent(name));
-        xhr.setRequestHeader("Content-Type", "application/octet-stream");
-        xhr.send(file);
+        if(!self._options.multipart) xhr.setRequestHeader("Content-Type", "application/octet-stream");
+
+        xhr.send(data);
     },
     _onComplete: function(id, xhr){
         // the request was aborted/cancelled
