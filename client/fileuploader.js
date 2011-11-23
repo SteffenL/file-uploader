@@ -279,6 +279,7 @@ qq.FileUploaderBasic = function(o){
         sizeLimit: 0,
         minSizeLimit: 0,
         multipart: false,
+        fieldName: 'qqfile',
         // events
         // return false to cancel submit
         onSubmit: function(id, fileName){},
@@ -350,6 +351,7 @@ qq.FileUploaderBasic.prototype = {
             action: this._options.action,
             maxConnections: this._options.maxConnections,
             multipart: this._options.multipart,
+            fieldName: this._options.fieldName,
             onProgress: function(id, fileName, loaded, total){
                 self._onProgress(id, fileName, loaded, total);
                 self._options.onProgress.call(self, id, fileName, loaded, total);
@@ -1300,10 +1302,10 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
             var paramValue = params[paramName];
             data.append(paramName, paramValue);
           }
-          data.append("qqfile", file);
+          data.append(self._options.fieldName, file);
         } else {
           // build query string
-          params['qqfile'] = name;
+          params[self._options.fieldName] = name;
           var queryString = qq.obj2url(params, this._options.action);
           var data = file;
         }
