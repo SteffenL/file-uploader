@@ -273,6 +273,7 @@ qq.FileUploaderBasic = function(o){
         button: null,
         multiple: true,
         maxConnections: 3,
+		useBase2Suffixes: false,
         // validation
         allowedExtensions: [],
         sizeLimit: 0,
@@ -483,12 +484,17 @@ qq.FileUploaderBasic.prototype = {
     },
     _formatSize: function(bytes){
         var i = -1;
-        do {
-            bytes = bytes / 1024;
-            i++;
-        } while (bytes > 99);
 
-        return Math.max(bytes, 0.1).toFixed(1) + ['kB', 'MB', 'GB', 'TB', 'PB', 'EB'][i];
+		if(this._options.useBase2Suffixes) {
+			i = Math.floor(Math.log(bytes) / Math.log(1024));
+			return (bytes / Math.pow(1024, i)).toFixed(2) + ['B', 'kiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'YiB'][i]
+		}
+		else {
+			i = Math.floor(Math.log(bytes) / Math.log(1000));
+			return (bytes / Math.pow(1000, i)).toFixed(2) + ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'YB'][i]
+		}
+
+        return '0B';
     }
 };
 
