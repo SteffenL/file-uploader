@@ -1191,8 +1191,8 @@ qq.extend(qq.UploadHandlerForm.prototype, {
         // form.setAttribute('enctype', 'multipart/form-data');
         // Because in this case file won't be attached to request
 
-        var csrf_param = $('meta[name=csrf-param]').attr('content');
-        var csrf_token = $('meta[name=csrf-token]').attr('content');
+        var csrf_param = document.getElementsByName("csrf-param")[0].getAttribute("content");
+        var csrf_token = document.getElementsByName("csrf-token")[0].getAttribute("content")
 
         var form = qq.toElement('<form method="post" enctype="multipart/form-data">' +
           '<input name="'+ csrf_param +'" type="hidden" value="'+ csrf_token +'">' +
@@ -1309,12 +1309,11 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
         }
 
         // add csrf
-		// TODO: This shouldn't use jQuery !!!
-        var csrf_token = $('meta[name=csrf-token]').attr('content');
+        var csrf_token = document.getElementsByName("csrf-token")[0].getAttribute("content")
 
         xhr.open("POST", queryString, true);
-		xhr.setRequestHeader("Accept", "application/json");
-		xhr.setRequestHeader("Accept", "text/javascript");
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader("Accept", "text/javascript");
         xhr.setRequestHeader("X-Csrf-Token", csrf_token);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("X-File-Name", encodeURIComponent(name));
