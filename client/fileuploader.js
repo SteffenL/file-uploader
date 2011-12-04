@@ -1319,7 +1319,7 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
         xhr.setRequestHeader("X-Csrf-Token", csrf_token);
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("X-File-Name", encodeURIComponent(name));
-        if(!self._options.multipart) xhr.setRequestHeader("Content-Type", "application/octet-stream");
+        if(!self._options.multipart) xhr.setRequestHeader("Content-Type", file.type);
 
         xhr.send(data);
     },
