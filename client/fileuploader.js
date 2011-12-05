@@ -557,7 +557,7 @@ qq.FileUploader = function(o){
 	});
 	// overwrite options with user supplied
 	qq.rextend(this._options, o);
-console.log( o );
+
 	this._element = this._options.element;
 	this._element.innerHTML = this._options.template(this._options);
 	this._listElement = this._options.listElement || this._find(this._element, 'list');
