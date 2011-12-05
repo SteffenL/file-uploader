@@ -1156,7 +1156,7 @@ qq.extend(qq.UploadHandlerForm.prototype, {
 		json = doc.body.innerHTML.match(/^\s*(<(\w+)>)?(.*?)(<\/\2>)?\s*$/)[3];
 
 		try {
-			response = eval("(" + json + ")");
+			response = JSON.parse("(" + json + ")");
 		} catch(err){
 			response = {};
 		}
@@ -1339,7 +1339,7 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
 			var response;
 
 			try {
-				response = eval("(" + xhr.responseText + ")");
+				response = JSON.parse("(" + xhr.responseText + ")");
 			} catch(err){
 				response = {};
 			}
