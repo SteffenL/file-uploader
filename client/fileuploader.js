@@ -1156,7 +1156,12 @@ qq.extend(qq.UploadHandlerForm.prototype, {
 		json = doc.body.innerHTML.match(/^\s*(<(\w+)>)?(.*?)(<\/\2>)?\s*$/)[3];
 
 		try {
-			response = JSON.parse("(" + json + ")");
+			if(window.JSON) {
+				response = JSON.parse("(" + json + ")");
+			}
+			else {
+				response = eval("(" + json + ")");
+			}
 		} catch(err){
 			response = {};
 		}
@@ -1339,7 +1344,12 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
 			var response;
 
 			try {
-				response = JSON.parse("(" + xhr.responseText + ")");
+				if(window.JSON) {
+					response = JSON.parse("(" + xhr.responseText + ")");
+				}
+				else {
+					response = eval("(" + xhr.responseText + ")");
+				}
 			} catch(err){
 				response = {};
 			}
