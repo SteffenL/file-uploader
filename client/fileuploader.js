@@ -526,8 +526,8 @@ qq.FileUploader = function(o){
 				'<span class="#{this.classes.file}"></span>' +
 				'<span class="#{this.classes.spinner}"></span>' +
 				'<span class="#{this.classes.size}"></span>' +
-				'<a class="#{this.classes.cancel}" href="#">#{this.cancel}</a>' +
-				'<span class="qq-upload-failed-text">#{this.failed}</span>' +
+				'<a class="#{this.classes.cancel}" href="#">#{this.labels.cancel}</a>' +
+				'<span class="qq-upload-failed-text">#{this.labels.failed}</span>' +
 			'</li>'),
 
 		classes: {
@@ -664,6 +664,7 @@ qq.extend(qq.FileUploader.prototype, {
 	_addToList: function(id, fileName){
 		var item = qq.toElement(this._options.fileTemplate(this._options));
 		item.qqFileId = id;
+		item.id = 'qq-file-upload-' + id;
 
 		var fileElement = this._find(item, 'file');
 		qq.setText(fileElement, this._formatFileName(fileName));
@@ -1157,7 +1158,7 @@ qq.extend(qq.UploadHandlerForm.prototype, {
 
 		try {
 			if(window.JSON) {
-				response = JSON.parse("(" + json + ")");
+				response = JSON.parse(json);
 			}
 			else {
 				response = eval("(" + json + ")");
@@ -1345,7 +1346,7 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
 
 			try {
 				if(window.JSON) {
-					response = JSON.parse("(" + xhr.responseText + ")");
+					response = JSON.parse(xhr.responseText);
 				}
 				else {
 					response = eval("(" + xhr.responseText + ")");
